@@ -10,7 +10,10 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,37 @@ public class CategoryServiceImplementation implements CategoryService {
         newCategory = categoryRepository.save(newCategory);
 
         return convertToResponse(newCategory);
+    }
+
+    @Override
+    public List<CategoryResponse> readCategories() {
+
+        return categoryRepository.findAll().stream()
+                .map(categoryEntity -> convertToResponse(categoryEntity))
+                .collect(Collectors.toList());
+
+//        Or
+
+//        List<CategoryEntity> categories = categoryRepository.findAll();
+//        List<CategoryResponse> categoryResponses = new ArrayList<>();
+//        for(CategoryEntity category : categories){
+//            categoryResponses.add(convertToResponse(category));
+//        }
+//
+//        return categoryResponses;
+    }
+
+    @Override
+    public CategoryResponse updateCategory(CategoryResponse category) {
+        return null;
+    }
+
+    @Override
+    public void deleteCategory(String categoryId) {
+        CategoryEntity existingCategory = categoryRepository.findByCategoryUid(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found with Id - "+categoryId));
+
+        categoryRepository.delete(existingCategory);
     }
 
     private CategoryResponse convertToResponse(CategoryEntity newCategory) {
