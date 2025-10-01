@@ -5,11 +5,14 @@ import com.example.billingsoftware.BillingSoftwareBackend.io.CategoryRequest;
 import com.example.billingsoftware.BillingSoftwareBackend.io.CategoryResponse;
 import com.example.billingsoftware.BillingSoftwareBackend.repository.CategoryRepository;
 import com.example.billingsoftware.BillingSoftwareBackend.service.CategoryService;
+import com.example.billingsoftware.BillingSoftwareBackend.service.FileUploadService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.plaf.multi.MultiMenuItemUI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +23,15 @@ import java.util.stream.Collectors;
 public class CategoryServiceImplementation implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final FileUploadService fileUploadService;
 
     @Override
-    public CategoryResponse addCategory(CategoryRequest request) {
+    public CategoryResponse addCategory(CategoryRequest request, MultipartFile file) {
         CategoryEntity newCategory = convertToEntity(request);
+        if(file != null){
+            String fileUrl = fileUploadService.uploadFile(file);
+            newCategory.setImageUrl(fileUrl);
+        }
         newCategory = categoryRepository.save(newCategory);
 
         return convertToResponse(newCategory);
@@ -57,6 +65,10 @@ public class CategoryServiceImplementation implements CategoryService {
         CategoryEntity existingCategory = categoryRepository.findByCategoryUid(categoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found with Id - "+categoryId));
 
+        String imageUrl = existingCategory.getImageUrl();
+        if(imageUrl != null){
+            fileUploadService.deleteFile(imageUrl);
+        }
         categoryRepository.delete(existingCategory);
     }
 
