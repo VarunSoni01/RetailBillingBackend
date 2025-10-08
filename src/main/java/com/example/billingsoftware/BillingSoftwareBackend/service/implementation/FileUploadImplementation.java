@@ -5,6 +5,7 @@ import com.example.billingsoftware.BillingSoftwareBackend.service.FileUploadServ
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -34,7 +35,14 @@ public class FileUploadImplementation implements FileUploadService {
             Path filePath = uploadPath.resolve(key);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            return filePath.toString();
+            String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/uploads/")
+                    .path(key)
+                    .toUriString();
+
+            return fileUrl;
+
+//            return filePath.toString();
         }catch (Exception e){
             throw new RuntimeException("Error while uploading files: "+e.getMessage());
         }
