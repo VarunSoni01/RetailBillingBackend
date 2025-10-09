@@ -3,6 +3,7 @@ package com.example.billingsoftware.BillingSoftwareBackend.controller;
 import com.example.billingsoftware.BillingSoftwareBackend.io.AuthRequest;
 import com.example.billingsoftware.BillingSoftwareBackend.io.AuthResponse;
 import com.example.billingsoftware.BillingSoftwareBackend.service.implementation.AppUserDetailsService;
+import com.example.billingsoftware.BillingSoftwareBackend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +27,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final AppUserDetailsService appUserDetailsService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/encode")
     public String encodePassword(@RequestBody Map<String, String> request){
@@ -36,6 +38,11 @@ public class AuthController {
     public AuthResponse login(@RequestBody AuthRequest request) throws Exception{
         authenticate(request.getEmail(),request.getPassword());
         final UserDetails userDetails = appUserDetailsService.loadUserByUsername(request.getEmail());
+        final String jwtToken = jwtUtil.generateToken(userDetails);
+
+        //fetch the role from repository
+        return new AuthResponse(request.getEmail(),jwtToken,"USER");
+
 
     }
 
