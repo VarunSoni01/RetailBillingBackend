@@ -2,6 +2,7 @@ package com.example.billingsoftware.BillingSoftwareBackend.controller;
 
 import com.example.billingsoftware.BillingSoftwareBackend.io.AuthRequest;
 import com.example.billingsoftware.BillingSoftwareBackend.io.AuthResponse;
+import com.example.billingsoftware.BillingSoftwareBackend.service.UserService;
 import com.example.billingsoftware.BillingSoftwareBackend.service.implementation.AppUserDetailsService;
 import com.example.billingsoftware.BillingSoftwareBackend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final AppUserDetailsService appUserDetailsService;
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     @PostMapping("/encode")
     public String encodePassword(@RequestBody Map<String, String> request){
@@ -39,9 +41,9 @@ public class AuthController {
         authenticate(request.getEmail(),request.getPassword());
         final UserDetails userDetails = appUserDetailsService.loadUserByUsername(request.getEmail());
         final String jwtToken = jwtUtil.generateToken(userDetails);
-
-        //fetch the role from repository
-        return new AuthResponse(request.getEmail(),jwtToken,"USER");
+        String role = userService.getUserRole(request.getEmail());
+        return new AuthResponse(request.getEmail(),role,jwtToken);
+//        return new AuthResponse(request.getEmail(),jwtToken,role);
 
 
     }

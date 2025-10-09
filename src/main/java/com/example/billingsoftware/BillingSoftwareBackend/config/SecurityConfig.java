@@ -1,11 +1,13 @@
 package com.example.billingsoftware.BillingSoftwareBackend.config;
 
+import com.example.billingsoftware.BillingSoftwareBackend.filters.JwtRequestFilter;
 import com.example.billingsoftware.BillingSoftwareBackend.service.implementation.AppUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -28,6 +31,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final AppUserDetailsService appUserDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
 
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.cors(Customizer.withDefaults())
@@ -35,7 +39,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/login").permitAll() // login is accessible by all users (admin, user or any other if available)
                         .requestMatchers("/category", "items").hasAnyRole("USER", "ADMIN") // category and item is accessible by user and admin both
                         .requestMatchers("/admin/**").hasRole("ADMIN") //admin route is only accesscible by admin user
-                        .anyRequest().authenticated()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        .anyRequest().authenticated()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
