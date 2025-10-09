@@ -13,14 +13,14 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/categories")
+//@RequestMapping("/categories")
 @RequiredArgsConstructor
 @CrossOrigin("*") //will accepts requests all origin
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @PostMapping("/addCategory")
+    @PostMapping("admin/categories/addCategory")
     @ResponseStatus(HttpStatus.CREATED)
 //    public CategoryResponse addCategory(@RequestBody CategoryRequest request){
     public CategoryResponse addCategory(@RequestPart("category")String categoryString, @RequestPart("file") MultipartFile file){
@@ -35,12 +35,12 @@ public class CategoryController {
     }
 
 
-    @GetMapping
+    @GetMapping("/categories")
     public List<CategoryResponse> getCategories(){
         return categoryService.readCategories();
     }
 
-    @DeleteMapping("deleteCategory/{categoryId}")
+    @DeleteMapping("categories/deleteCategory/{categoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable String categoryId){
         try{
