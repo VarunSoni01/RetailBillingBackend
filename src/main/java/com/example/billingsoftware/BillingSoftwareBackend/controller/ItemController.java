@@ -25,7 +25,8 @@ public class ItemController {
         ObjectMapper objectMapper = new ObjectMapper();
         ItemRequest itemRequest = null;
         try{
-            objectMapper.readValue(itemString, ItemRequest.class);
+            itemRequest = objectMapper.readValue(itemString, ItemRequest.class);
+
             return itemService.add(itemRequest, image);
         }catch (JsonProcessingException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error occured while converting json");
@@ -39,7 +40,7 @@ public class ItemController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("admin/item/delete/{itemId}")
-    public void readItems(@PathVariable String itemId){
+    public void deleteItem(@PathVariable String itemId){
         try{
             itemService.deleteItem(itemId);
         }catch (Exception e){
