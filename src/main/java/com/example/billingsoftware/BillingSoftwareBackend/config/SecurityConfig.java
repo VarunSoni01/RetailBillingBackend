@@ -36,7 +36,7 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/encode").permitAll() // login is accessible by all users (admin, user or any other if available)
-                        .requestMatchers("/category", "/items").hasAnyRole("USER", "ADMIN") // category and item is accessible by user and admin both
+                        .requestMatchers("/category", "/categories", "/items").hasAnyRole("USER", "ADMIN") // category and item is accessible by user and admin both
                         .requestMatchers("/admin/**").hasRole("ADMIN") //admin route is only accesscible by admin user
                         .anyRequest().authenticated()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

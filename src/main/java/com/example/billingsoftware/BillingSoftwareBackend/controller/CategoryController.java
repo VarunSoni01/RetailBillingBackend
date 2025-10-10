@@ -40,7 +40,7 @@ public class CategoryController {
         return categoryService.readCategories();
     }
 
-    @DeleteMapping("categories/deleteCategory/{categoryId}")
+    @DeleteMapping("admin/categories/deleteCategory/{categoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable String categoryId){
         try{
