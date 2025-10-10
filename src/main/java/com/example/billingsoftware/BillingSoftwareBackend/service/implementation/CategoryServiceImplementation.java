@@ -4,6 +4,7 @@ import com.example.billingsoftware.BillingSoftwareBackend.entity.CategoryEntity;
 import com.example.billingsoftware.BillingSoftwareBackend.io.CategoryRequest;
 import com.example.billingsoftware.BillingSoftwareBackend.io.CategoryResponse;
 import com.example.billingsoftware.BillingSoftwareBackend.repository.CategoryRepository;
+import com.example.billingsoftware.BillingSoftwareBackend.repository.ItemRepository;
 import com.example.billingsoftware.BillingSoftwareBackend.service.CategoryService;
 import com.example.billingsoftware.BillingSoftwareBackend.service.FileUploadService;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ public class CategoryServiceImplementation implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final FileUploadService fileUploadService;
+    private final ItemRepository itemRepository;
 
     @Override
     public CategoryResponse addCategory(CategoryRequest request, MultipartFile file) {
@@ -73,12 +75,14 @@ public class CategoryServiceImplementation implements CategoryService {
     }
 
     private CategoryResponse convertToResponse(CategoryEntity newCategory) {
+        Integer itemCounts = itemRepository.countByCategoryId(newCategory.getId());
         return CategoryResponse.builder()
                 .categoryId(newCategory.getCategoryUid())
                 .name(newCategory.getName())
                 .description(newCategory.getDescription())
                 .bgColor(newCategory.getBgColor())
                 .imageUrl(newCategory.getImageUrl())
+                .items(itemCounts)
                 .createdAt(newCategory.getCreatedAt())
                 .updatedAt(newCategory.getUpdatedAt())
                 .build();
