@@ -93,4 +93,25 @@ public class OrderServiceImplementaion implements OrderService {
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public OrderResponse verifyPayment(PaymentVerficationRequest request) {
+        OrderEntity existingOrder = orderEntityRepository.findByOrderId(request.getOrderId()).orElseThrow(() -> new RuntimeException("Order not found"));
+        if(!verifyRazorpaySignature(request.getRazorpayOrderId(), request.getRazorpayPaymentId(),request.getRazorpaySignature())){
+            throw new RuntimeException("Payment verification failed");
+        }
+
+        PaymentDetails paymentDetails = existingOrder.getPaymentDetails();
+        paymentDetails.setRazorpayPaymentId(request.getRazorpayPaymentId());
+        paymentDetails.setRazorpayOrderId(request.getRazorpayOrderId());
+        paymentDetails.setRazorpaySignature(request.getRazorpaySignature());
+        paymentDetails.setPaymentStatus(PaymentDetails.PaymentStatus.COMPLETED);
+
+        existingOrder = orderEntityRepository.save(existingOrder);
+        return convertToResponse(existingOrder);
+    }
+
+    private boolean verifyRazorpaySignature(String razorpayOrderId, String razorpayPaymentId, String razorpaySignature) {
+        return true; //for testing
+    }
 }
