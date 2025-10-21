@@ -22,7 +22,7 @@ public class OrderController {
         return orderService.createOrder(request);
     }
 
-    @PostMapping("/delete/{orderId}")
+    @DeleteMapping("/delete/{orderId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOrder(@PathVariable String orderId){
         orderService.deleteOrder(orderId);
