@@ -25,7 +25,7 @@ public class OrderEntity {
     private Long id;
     private String orderId;
     private String customerName;
-    private String mobileNumber;
+    private String phoneNumber;
     private Double subTotal;
     private Double grandTotal;
     private Double tax;

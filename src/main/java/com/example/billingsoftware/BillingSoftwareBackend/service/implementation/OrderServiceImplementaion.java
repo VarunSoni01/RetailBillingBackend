@@ -2,10 +2,7 @@ package com.example.billingsoftware.BillingSoftwareBackend.service.implementatio
 
 import com.example.billingsoftware.BillingSoftwareBackend.entity.OrderEntity;
 import com.example.billingsoftware.BillingSoftwareBackend.entity.OrderItemEntity;
-import com.example.billingsoftware.BillingSoftwareBackend.io.OrderRequest;
-import com.example.billingsoftware.BillingSoftwareBackend.io.OrderResponse;
-import com.example.billingsoftware.BillingSoftwareBackend.io.PaymentDetails;
-import com.example.billingsoftware.BillingSoftwareBackend.io.PaymentMethod;
+import com.example.billingsoftware.BillingSoftwareBackend.io.*;
 import com.example.billingsoftware.BillingSoftwareBackend.repository.OrderEntityRepository;
 import com.example.billingsoftware.BillingSoftwareBackend.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +18,7 @@ public class OrderServiceImplementaion implements OrderService {
     private final OrderEntityRepository orderEntityRepository;
 
     @Override
-    public OrderRequest createOrder(OrderRequest request) {
+    public OrderResponse createOrder(OrderRequest request) {
         OrderEntity newOrder = converToOrderEntity(request);
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setPaymentStatus(newOrder.getPaymentMethod() == PaymentMethod.CASH ? PaymentDetails.PaymentStatus.COMPLETED : PaymentDetails.PaymentStatus.PENDING);
@@ -36,7 +33,51 @@ public class OrderServiceImplementaion implements OrderService {
         return convertToResponse(newOrder);
     }
 
+    private OrderItemEntity converToOrderItemEntity(OrderRequest.OrderItemRequest orderItemRequest) {
+        return OrderItemEntity.builder()
+                .itemId(orderItemRequest.getItemId())
+                .name(orderItemRequest.getName())
+                .price(orderItemRequest.getPrice())
+                .quantity(orderItemRequest.getQuantity())
+                .build();
+    }
 
+    private OrderResponse convertToResponse(OrderEntity newOrder) {
+        return OrderResponse.builder()
+                .orderId(newOrder.getOrderId())
+                .customerName(newOrder.getCustomerName())
+                .phoneNumber(newOrder.getPhoneNumber())
+                .subTotal(newOrder.getSubTotal())
+                .tax(newOrder.getTax())
+                .grandTotal(newOrder.getGrandTotal())
+                .paymentMethod(newOrder.getPaymentMethod())
+                .items(newOrder.getItems().stream()
+                        .map(this::convertToItemResponse)
+                        .collect(Collectors.toList()))
+                .paymentDetails(newOrder.getPaymentDetails())
+                .createdAt(newOrder.getCreatedAt())
+                .build();
+    }
+
+    private OrderResponse.OrderItemResponse convertToItemResponse(OrderItemEntity orderItemEntity) {
+        return OrderResponse.OrderItemResponse.builder()
+                .itemId(orderItemEntity.getItemId())
+                .name(orderItemEntity.getName())
+                .price(orderItemEntity.getPrice())
+                .quantity(orderItemEntity.getQuantity())
+                .build();
+    }
+
+    private OrderEntity converToOrderEntity(OrderRequest request) {
+        return OrderEntity.builder()
+                .customerName(request.getCustomerName())
+                .phoneNumber(request.getPhoneNumber())
+                .subTotal(request.getSubTotal())
+                .tax(request.getTax())
+                .grandTotal(request.getGrandTotal())
+                .paymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()))
+                .build();
+    }
 
 
     @Override

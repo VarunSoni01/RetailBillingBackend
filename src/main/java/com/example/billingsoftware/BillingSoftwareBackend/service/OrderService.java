@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    OrderRequest createOrder(OrderRequest request);
+    OrderResponse createOrder(OrderRequest request);
 
     void deleteOrder(String orderId);
 
