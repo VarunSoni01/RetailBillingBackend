@@ -6,8 +6,11 @@ import com.example.billingsoftware.BillingSoftwareBackend.io.*;
 import com.example.billingsoftware.BillingSoftwareBackend.repository.OrderEntityRepository;
 import com.example.billingsoftware.BillingSoftwareBackend.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -109,6 +112,24 @@ public class OrderServiceImplementaion implements OrderService {
 
         existingOrder = orderEntityRepository.save(existingOrder);
         return convertToResponse(existingOrder);
+    }
+
+    @Override
+    public double sumSalesByDate(LocalDate date) {
+        return orderEntityRepository.sumSalesByDate(date);
+    }
+
+    @Override
+    public Long countOrdersByDate(LocalDate date) {
+        return orderEntityRepository.countByOrderDate(date);
+    }
+
+    @Override
+    public List<OrderResponse> findRecentOrders() {
+        return orderEntityRepository.findRecentOrders()
+                .stream()
+                .map(orderEntity -> convertToResponse(orderEntity))
+                .collect(Collectors.toList());
     }
 
     private boolean verifyRazorpaySignature(String razorpayOrderId, String razorpayPaymentId, String razorpaySignature) {
