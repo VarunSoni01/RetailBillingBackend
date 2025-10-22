@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/payments")
 @RequiredArgsConstructor
+@CrossOrigin("*") //will accepts requests all origin
 public class PaymentController {
 
     private final RazorpayService razorpayService;
