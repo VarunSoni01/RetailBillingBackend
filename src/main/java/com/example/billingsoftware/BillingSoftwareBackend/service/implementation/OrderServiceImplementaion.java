@@ -116,7 +116,9 @@ public class OrderServiceImplementaion implements OrderService {
 
     @Override
     public double sumSalesByDate(LocalDate date) {
-        return orderEntityRepository.sumSalesByDate(date);
+        Double total = orderEntityRepository.sumSalesByDate(date);
+        return total != null ? total : 0.0;
+
     }
 
     @Override
