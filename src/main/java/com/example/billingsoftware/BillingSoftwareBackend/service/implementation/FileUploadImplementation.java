@@ -52,8 +52,18 @@ public class FileUploadImplementation implements FileUploadService {
     @Override
     public Boolean deleteFile(String imageUrl) {
         try{
-            Path path = Paths.get(imageUrl);
-            return Files.deleteIfExists(path);
+            String fileName = imageUrl.substring(imageUrl.lastIndexOf('/')+1);
+
+            Path uploadPath = Paths.get(UPLOAD_DIR_PATH).toAbsolutePath().normalize();
+            Path filePath = uploadPath.resolve(fileName).toAbsolutePath().normalize();
+
+            // Prevent path traversal: ensure the resolved file is inside the upload directory
+            if (!filePath.startsWith(uploadPath)) {
+                throw new RuntimeException("Invalid file path");
+            }
+
+            return Files.deleteIfExists(filePath);
+
         }catch (Exception e){
             throw new RuntimeException("Error deleting file: "+e.getMessage());
         }
