@@ -11,9 +11,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.plaf.multi.MultiMenuItemUI;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -30,8 +36,7 @@ public class CategoryServiceImplementation implements CategoryService {
     @Override
     public CategoryResponse addCategory(CategoryRequest request, MultipartFile file) {
         CategoryEntity newCategory = convertToEntity(request);
-        if(file != null){
-            String fileUrl = fileUploadService.uploadFile(file);
+        if(file != null){            String fileUrl = fileUploadService.uploadFile(file);
             newCategory.setImageUrl(fileUrl);
         }
         newCategory = categoryRepository.save(newCategory);
