@@ -37,22 +37,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        http.cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
+        http.cors(Customizer.withDefaults()) // enabling cors with default settings
+                .csrf(AbstractHttpConfigurer::disable) // disabling csrf
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/encode", "/uploads/**").permitAll() // login is accessible by all users (admin, user or any other if available)
                         .requestMatchers("/category", "/categories", "/items", "/orders", "/payments", "/dashboard").hasAnyRole("USER", "ADMIN") // category and item is accessible by user and admin both
                         .requestMatchers("/admin/**").hasRole("ADMIN") //admin route is only accesscible by admin user
-                        .anyRequest().authenticated()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
+                        .anyRequest().authenticated()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))// managing session as stateless
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // adding jwtRequestFilter before UsernamePasswordAuthenticationFilter to ensure JWT validation happens before Spring Security's authentication process
         return http.build();
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
-
 
     @Bean
     public CorsFilter corsFilter(){
@@ -79,5 +72,13 @@ public class SecurityConfig {
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(authenticationProvider);
     }
+
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+
 
 }

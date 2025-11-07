@@ -21,7 +21,7 @@ public class JwtUtil {
     private String SECRET_KEY;
 
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claiams = new HashMap<>();
+        Map<String, Object> claiams = new HashMap<>(); //what are claims - claims are the information about the user that we want to include in the token
         return createToken(claiams, userDetails.getUsername());
     }
 
@@ -36,29 +36,28 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token){
-        return extractClaim(token, Claims::getSubject);
+        return extractClaim(token, Claims::getSubject); // extracting the subject from the token which is the username
+    }
+
+    public <T> T extractClaim (String token, Function<Claims, T> claimsResolver) { // generic method to extract any claim from the token
+        final Claims claims = extractAllClaims(token); // extracting all the claims from the token
+        return claimsResolver.apply(claims); // applying the function to the claims to get the desired claim
     }
 
     public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    public <T> T extractClaim (String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-
+        return extractClaim(token, Claims::getExpiration); // extracting the expiration date from the token
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey((SECRET_KEY)).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey((SECRET_KEY)).parseClaimsJws(token).getBody(); // parsing the token to get the claims
     }
 
     private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return extractExpiration(token).before(new Date()); // checking if the token is expired
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username. equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username. equals(userDetails.getUsername()) && !isTokenExpired(token)); // validating the token by checking the username and expiration
     }
 }
